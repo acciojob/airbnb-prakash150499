@@ -13,6 +13,7 @@ public class HotelManagementRepository {
     HashMap<String,Hotel> hotelHashMap = new HashMap<>();
     HashMap<Integer,User> userHashMap = new HashMap<>();
     HashMap<String,Booking> bookingHashMap = new HashMap<>();
+    HashMap<Integer,List<Booking>> userBookingMap=new HashMap<>();
     public String addHotel(Hotel hotel) {
 
         if (hotel.getHotelName() == null) return "FAILURE";
@@ -66,16 +67,39 @@ public class HotelManagementRepository {
             int amountTobePaid = booking.getNoOfRooms()*hotel.getPricePerNight();
             booking.setAmountToBePaid(amountTobePaid);
             bookingHashMap.put(bookingId,booking);
+            int userAadharNumber=booking.getBookingAadharCard();
+            associateBookingWithUser(userAadharNumber,booking);
             return amountTobePaid;
     }
-    public int getBookings(int a){
-        int count = 0;
-        for(Booking b : bookingHashMap.values()){
-            if(b.getBookingAadharCard() == a){
-                count++;
+
+    private void associateBookingWithUser(int userAadharNumber, Booking booking) {
+        if(userBookingMap.containsKey(userAadharNumber))
+        {
+            List<Booking>bookingList=userBookingMap.get(userAadharNumber);
+            bookingList.add(booking);
+            userBookingMap.put(userAadharNumber,bookingList);
+        }
+        else
+        {
+            List<Booking>bookingList=new ArrayList<>();
+            bookingList.add(booking);
+            userBookingMap.put(userAadharNumber,bookingList);
+        }
+    }
+
+    public int getBookings(int aadharNo){
+        int userBookingsCount = 0;
+
+        Set<Integer>keys=userBookingMap.keySet();
+        for(int key:keys)
+        {
+            if(key==aadharNo)
+            {
+                List<Booking> bookingList=userBookingMap.get(key);
+                userBookingsCount= bookingList.size();
             }
         }
-        return count;
+        return userBookingsCount;
     }
     public Hotel updateFacilities(List<Facility>newFacilities,String hotelName){
 

@@ -68,9 +68,9 @@ public class HotelManagementController {
     public int getBookings(@PathVariable("aadharCard")Integer aadharCard)
     {
         //In this function return the bookings done by a person
-        int s = service.getBookings(aadharCard);
-        if(s!=0) return s;
-        return 0;
+        int bookingCount= service.getBookings(aadharCard);
+
+        return bookingCount;
     }
 
     @PutMapping("/update-facilities")
