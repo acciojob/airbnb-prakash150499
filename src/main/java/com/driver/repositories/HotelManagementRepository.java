@@ -103,23 +103,18 @@ public class HotelManagementRepository {
     }
     public Hotel updateFacilities(List<Facility>newFacilities,String hotelName){
 
-        if(!hotelHashMap.containsKey(hotelName))return null;
 
         Hotel hotel = hotelHashMap.get(hotelName);
-
         List<Facility> list = hotel.getFacilities();
 
         for(int i=0;i<newFacilities.size();i++){
-
             if(!list.contains(newFacilities.get(i))){
 
                 list.add(newFacilities.get(i));
             }
 
         }
-
         hotel.setFacilities(list);
-
         hotelHashMap.put(hotelName,hotel);
 
         return  hotel;

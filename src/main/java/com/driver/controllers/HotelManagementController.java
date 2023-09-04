@@ -80,10 +80,8 @@ public class HotelManagementController {
         //If the hotel is already having that facility ignore that facility otherwise add that facility in the hotelDb
         //return the final updated List of facilities and also update that in your hotelDb
         //Note that newFacilities can also have duplicate facilities possible
-        Hotel h =  service.updateFacilities(newFacilities,hotelName);
-        if(!h.equals(null) ) return h;
-
-        return null;
+        Hotel hotel =  service.updateFacilities(newFacilities,hotelName);
+        return hotel;
     }
 
 }
