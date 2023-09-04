@@ -15,26 +15,17 @@ public class HotelManagementService {
 
     HotelManagementRepository repository=new HotelManagementRepository();
 
-    public String addHotel(Hotel hotel){
-        return repository.addHotel(hotel);
-
-    }
+    public String addHotel(Hotel hotel){return repository.addHotel(hotel);}
     public Integer addUser(User user){
         return repository.addUser(user);
     }
     public String getHotelWithMostFacilities(){
         return repository.getHotelWithMostFacilities();
     }
-    public int bookARoom(Booking booking){
-        return repository.bookARoom(booking);
-
-    }
+    public int bookARoom(Booking booking){return repository.bookARoom(booking);}
     public int getBookings(int a){
         return repository.getBookings(a);
     }
-    public Hotel updateFacilities(List<Facility>facility, String hotel){
-
-        return repository.updateFacilities(facility,hotel);
-    }
+    public Hotel updateFacilities(List<Facility>facility, String hotel){return repository.updateFacilities(facility,hotel);}
 
 }

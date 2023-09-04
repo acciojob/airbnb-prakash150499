@@ -15,15 +15,13 @@ public class HotelManagementRepository {
     HashMap<String,Booking> bookingHashMap = new HashMap<>();
     public String addHotel(Hotel hotel) {
 
-        if (hotel.getHotelName() == null)return "FAILURE";
-        if (hotelHashMap.containsKey(hotel.getHotelName()))return "FAILURE";
+        if (hotel.getHotelName() == null) return "FAILURE";
+        if (hotelHashMap.containsKey(hotel.getHotelName())) return "FAILURE";
         String hotelName = hotel.getHotelName();
         hotelHashMap.put(hotelName, hotel);
         return "SUCCESS";
     }
-
     public Integer addUser(User user){
-        if(userHashMap.containsKey(user.getaadharCardNo())) return null;
         userHashMap.put(user.getaadharCardNo(),user);
         return user.getaadharCardNo();
     }

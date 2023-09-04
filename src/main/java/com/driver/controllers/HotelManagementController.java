@@ -25,25 +25,17 @@ public class HotelManagementController {
         //incase the hotelName is null or the hotel Object is null return an empty a FAILURE
         //Incase somebody is trying to add the duplicate hotelName return FAILURE
         //in all other cases return SUCCESS after successfully adding the hotel to the hotelDb.
-        String s = service.addHotel(hotel);
-        if(s.equals("SUCCESS")) return "SUCCESS";
-        if(s.equals("FAILURE")) return "FAILURE";
-
-
-
-        return null;
+        String status = service.addHotel(hotel);
+        return status;
     }
 
     @PostMapping("/add-user")
-    public Integer addUser(@RequestBody User user){
-
+    public Integer addUser(@RequestBody User user)
+    {
         //You need to add a User Object to the database
         //Assume that user will always be a valid user and return the aadharCardNo of the user
-         Integer ans = service.addUser(user);
-         if(ans != 0){
-             return ans;
-         }
-       return null;
+         Integer aadharNo = service.addUser(user);
+         return aadharNo;
     }
 
     @GetMapping("/get-hotel-with-most-facilities")
