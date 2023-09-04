@@ -44,12 +44,10 @@ public class HotelManagementController {
         //Out of all the hotels we have added so far, we need to find the hotelName with most no of facilities
         //Incase there is a tie return the lexicographically smaller hotelName
         //Incase there is not even a single hotel with atleast 1 facility return "" (empty string)
-        String s =  service.getHotelWithMostFacilities();
-        if(!s.equals(null)){
-            return s;
-        }
+        String hotelName =  service.getHotelWithMostFacilities();
 
-        return null;
+
+        return hotelName;
     }
 
     @PostMapping("/book-a-room")
@@ -61,11 +59,9 @@ public class HotelManagementController {
         //Calculate the total amount paid by the person based on no. of rooms booked and price of the room per night.
         //If there arent enough rooms available in the hotel that we are trying to book return -1 
         //in other case return total amount paid
-       int s = service.bookARoom(booking);
-       if(s!=0) return s;
+       int totalAmountPaid = service.bookARoom(booking);
+       return totalAmountPaid;
 
-        
-        return 0;
     }
     
     @GetMapping("/get-bookings-by-a-person/{aadharCard}")

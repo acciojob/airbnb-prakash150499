@@ -26,41 +26,47 @@ public class HotelManagementRepository {
         return user.getaadharCardNo();
     }
     public String getHotelWithMostFacilities(){
-        int max = 0;
-        for(Hotel h : hotelHashMap.values()){
-            List<Facility> list = h.getFacilities();
-            max = Math.max(max,list.size());
+
+        String result = "";  // Initialize the result as an empty string
+        int maxFacilities = 0;  // Initialize the maximum facilities as 0
+
+        for (Map.Entry<String, Hotel> entry : hotelHashMap.entrySet()) {
+            Hotel hotel = entry.getValue();
+            List<Facility> facilities = hotel.getFacilities();
+            int avaliableFacility=facilities.size();
+
+            // Check if this hotel has more facilities
+            if (avaliableFacility > maxFacilities) {
+                maxFacilities = avaliableFacility;
+                result = hotel.getHotelName();
+            }
+            // Check if this hotel has the same facilities but a lexicographically smaller name
+            else if (avaliableFacility == maxFacilities && hotel.getHotelName().compareTo(result) < 0) {
+                result = hotel.getHotelName();
+            }
         }
-        List<String>al = new ArrayList<>();
-        if(max == 0) return "";
-        for(Hotel h : hotelHashMap.values()){
-            List<Facility>list = h.getFacilities();
-            if(list.size() == max)
-                al.add(h.getHotelName());
-        }
-        Collections.sort(al);
-        return al.get(0);
+
+        return result;
 
     }
     public int bookARoom(Booking booking){
-        if(!hotelHashMap.containsKey(booking.getHotelName())){
+        String bookingId = UUID.randomUUID().toString();
+        String hotelName=booking.getHotelName();
+        Hotel hotel=hotelHashMap.get(hotelName);
+
+        if(hotel.getAvailableRooms()<booking.getNoOfRooms()) {
             return -1;
         }
-        Hotel h = hotelHashMap.get(booking.getHotelName());
-        if(h.getAvailableRooms()>=booking.getNoOfRooms()){
-            int remainingrooms = h.getAvailableRooms()-booking.getNoOfRooms();
-            h.setAvailableRooms(remainingrooms);
-            String name = h.getHotelName();
-            hotelHashMap.put(name,h);
-            String ss = UUID.randomUUID()+"";
-            int amount = booking.getNoOfRooms()*h.getPricePerNight();
-            booking.setBookingId(ss);
-            booking.setAmountToBePaid(amount);
-            bookingHashMap.put(ss,booking);
-            return amount;
-        }
-        return -1;
-
+            int remainingRooms = hotel.getAvailableRooms()-booking.getNoOfRooms();
+            hotel.setAvailableRooms(remainingRooms);
+            String name = hotel.getHotelName();
+            hotelHashMap.put(name,hotel);
+            booking.setBookingId(bookingId);
+            // Total amout to be paid
+            int amountTobePaid = booking.getNoOfRooms()*hotel.getPricePerNight();
+            booking.setAmountToBePaid(amountTobePaid);
+            bookingHashMap.put(bookingId,booking);
+            return amountTobePaid;
     }
     public int getBookings(int a){
         int count = 0;
