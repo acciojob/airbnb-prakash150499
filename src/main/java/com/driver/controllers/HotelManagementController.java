@@ -1,7 +1,7 @@
 package com.driver.controllers;
 
 import com.driver.model.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.driver.services.HotelManagementService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -10,16 +10,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/hotel")
 public class HotelManagementController {
     //@Autowired
-    Servicelayer ser = new Servicelayer();
+    HotelManagementService service = new HotelManagementService();
 
     @PostMapping("/add-hotel")
     public String addHotel(@RequestBody Hotel hotel){
@@ -28,7 +25,7 @@ public class HotelManagementController {
         //incase the hotelName is null or the hotel Object is null return an empty a FAILURE
         //Incase somebody is trying to add the duplicate hotelName return FAILURE
         //in all other cases return SUCCESS after successfully adding the hotel to the hotelDb.
-        String s = ser.addHotel(hotel);
+        String s = service.addHotel(hotel);
         if(s.equals("SUCCESS")) return "SUCCESS";
         if(s.equals("FAILURE")) return "FAILURE";
 
@@ -42,7 +39,7 @@ public class HotelManagementController {
 
         //You need to add a User Object to the database
         //Assume that user will always be a valid user and return the aadharCardNo of the user
-         Integer ans = ser.addUser(user);
+         Integer ans = service.addUser(user);
          if(ans != 0){
              return ans;
          }
@@ -55,7 +52,7 @@ public class HotelManagementController {
         //Out of all the hotels we have added so far, we need to find the hotelName with most no of facilities
         //Incase there is a tie return the lexicographically smaller hotelName
         //Incase there is not even a single hotel with atleast 1 facility return "" (empty string)
-        String s =  ser.getHotelWithMostFacilities();
+        String s =  service.getHotelWithMostFacilities();
         if(!s.equals(null)){
             return s;
         }
@@ -72,7 +69,7 @@ public class HotelManagementController {
         //Calculate the total amount paid by the person based on no. of rooms booked and price of the room per night.
         //If there arent enough rooms available in the hotel that we are trying to book return -1 
         //in other case return total amount paid
-       int s = ser.bookARoom(booking);
+       int s = service.bookARoom(booking);
        if(s!=0) return s;
 
         
@@ -83,7 +80,7 @@ public class HotelManagementController {
     public int getBookings(@PathVariable("aadharCard")Integer aadharCard)
     {
         //In this function return the bookings done by a person
-        int s = ser.getBookings(aadharCard);
+        int s = service.getBookings(aadharCard);
         if(s!=0) return s;
         return 0;
     }
@@ -95,7 +92,7 @@ public class HotelManagementController {
         //If the hotel is already having that facility ignore that facility otherwise add that facility in the hotelDb
         //return the final updated List of facilities and also update that in your hotelDb
         //Note that newFacilities can also have duplicate facilities possible
-        Hotel h =  ser.updateFacilities(newFacilities,hotelName);
+        Hotel h =  service.updateFacilities(newFacilities,hotelName);
         if(!h.equals(null) ) return h;
 
         return null;

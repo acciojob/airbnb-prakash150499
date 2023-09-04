@@ -10,123 +10,92 @@ import java.util.*;
 
 @Repository
 public class HotelManagementRepository {
-
-    HashMap<String,Hotel>hotelDb=new HashMap<>();
-    HashMap<Integer,User> userDb=new HashMap<>();
-    HashMap<String,Booking> bookingDb=new HashMap<>();
-    HashMap<Integer,List<Booking>>userBookingDb=new HashMap<>();
+    HashMap<String,Hotel> hotelHashMap = new HashMap<>();
+    HashMap<Integer,User> userHashMap = new HashMap<>();
+    HashMap<String,Booking> bookingHashMap = new HashMap<>();
     public String addHotel(Hotel hotel) {
-        //You need to add an hotel to the database
-        //incase the hotelName is null or the hotel Object is null return an empty a FAILURE
 
-        if(hotel==null)
-        {
-            return "FAILURE";
-        }
-        if(hotel.getHotelName()==null)
-        {
-            return "FAILURE";
-        }
-        //Incase somebody is trying to add the duplicate hotelName return FAILURE
-        String hotelName=hotel.getHotelName();
-        if(hotelDb.containsKey(hotelName))
-        {
-            return "FAILURE";
-        }
-        //in all other cases return SUCCESS after successfully adding the hotel to the hotelDb.
-        hotelDb.put(hotelName,hotel);
-
+        if (hotel.getHotelName() == null)return "FAILURE";
+        if (hotelHashMap.containsKey(hotel.getHotelName()))return "FAILURE";
+        String hotelName = hotel.getHotelName();
+        hotelHashMap.put(hotelName, hotel);
         return "SUCCESS";
     }
 
-
-    public Integer addUser(User user) {
-        //You need to add a User Object to the database
-        int aadharNo=user.getaadharCardNo();
-        userDb.put(aadharNo,user);
-        //Assume that user will always be a valid user and return the aadharCardNo of the user
-        return aadharNo;
+    public Integer addUser(User user){
+        if(userHashMap.containsKey(user.getaadharCardNo())) return null;
+        userHashMap.put(user.getaadharCardNo(),user);
+        return user.getaadharCardNo();
     }
-
-    public String getHotelWithMostFacilities() {
-        //Out of all the hotels we have added so far, we need to find the hotelName with most no of facilities
-        //Incase there is a tie return the lexicographically smaller hotelName
-        //Incase there is not even a single hotel with atleast 1 facility return "" (empty string)
-        String result="";
-        int maxFacilities=0;
-        for(Map.Entry<String,Hotel> entry :hotelDb.entrySet())
-        {
-            Hotel currentHotel=entry.getValue();
-            List<Facility>facilities=currentHotel.getFacilities();
-            if(facilities.size()>maxFacilities)
-            {
-                maxFacilities=facilities.size();
-                result= entry.getKey();
-            }
-            else if (facilities.size() == maxFacilities) {
-                // Found a hotel with the same number of facilities, compare names lexicographically
-                if (currentHotel.getHotelName().compareTo(result) < 0) {
-                    result = currentHotel.getHotelName();
-                }
-            }
-
+    public String getHotelWithMostFacilities(){
+        int max = 0;
+        for(Hotel h : hotelHashMap.values()){
+            List<Facility> list = h.getFacilities();
+            max = Math.max(max,list.size());
         }
-        return result;
+        List<String>al = new ArrayList<>();
+        if(max == 0) return "";
+        for(Hotel h : hotelHashMap.values()){
+            List<Facility>list = h.getFacilities();
+            if(list.size() == max)
+                al.add(h.getHotelName());
+        }
+        Collections.sort(al);
+        return al.get(0);
+
     }
-
-    public int bookARoom(Booking booking) {
-        //The booking object coming from postman will have all the attributes except bookingId and amountToBePaid;
-        //Have bookingId as a random UUID generated String
-        String bookingId = UUID.randomUUID().toString();
-        booking.setBookingId(bookingId);
-        //save the booking Entity and keep the bookingId as a primary key
-        bookingDb.put(bookingId,booking);
-        //Calculate the total amount paid by the person based on no. of rooms booked and price of the room per night.
-        String hotelName=booking.getHotelName();
-        Hotel hotel=hotelDb.get(hotelName);
-
-        int pricePerNight=hotel.getPricePerNight();
-        int totalPrice=booking.getNoOfRooms()*pricePerNight;
-        booking.setAmountToBePaid(totalPrice);
-        bookingDb.put(bookingId,booking);
-
-        if(hotel.getAvailableRooms()<booking.getNoOfRooms())
-        {
+    public int bookARoom(Booking booking){
+        if(!hotelHashMap.containsKey(booking.getHotelName())){
             return -1;
         }
-        hotel.setAvailableRooms(hotel.getAvailableRooms()-booking.getNoOfRooms());
-        int userName=booking.getBookingAadharCard();
-        associateBookingWithUser(userName,booking);
-        //If there arent enough rooms available in the hotel that we are trying to book return -1
-        //in other case return total amount paid
-
-        return totalPrice;
-    }
-
-    private void associateBookingWithUser(int aadharNo, Booking booking) {
-
-        if(userBookingDb.containsKey(aadharNo))
-        {
-            userBookingDb.get(aadharNo).add(booking);
+        Hotel h = hotelHashMap.get(booking.getHotelName());
+        if(h.getAvailableRooms()>=booking.getNoOfRooms()){
+            int remainingrooms = h.getAvailableRooms()-booking.getNoOfRooms();
+            h.setAvailableRooms(remainingrooms);
+            String name = h.getHotelName();
+            hotelHashMap.put(name,h);
+            String ss = UUID.randomUUID()+"";
+            int amount = booking.getNoOfRooms()*h.getPricePerNight();
+            booking.setBookingId(ss);
+            booking.setAmountToBePaid(amount);
+            bookingHashMap.put(ss,booking);
+            return amount;
         }
-        else
-        {
-            List<Booking>bookingList=new ArrayList<>();
-            bookingList.add(booking);
-            userBookingDb.put(aadharNo,bookingList);
+        return -1;
+
+    }
+    public int getBookings(int a){
+        int count = 0;
+        for(Booking b : bookingHashMap.values()){
+            if(b.getBookingAadharCard() == a){
+                count++;
+            }
         }
+        return count;
     }
+    public Hotel updateFacilities(List<Facility>newFacilities,String hotelName){
 
-    public int getBookings(Integer aadharCard) {
+        if(!hotelHashMap.containsKey(hotelName))return null;
 
-        int bookingsPerUser=userBookingDb.get(aadharCard).size();
-        return 0;
-    }
+        Hotel hotel = hotelHashMap.get(hotelName);
 
-    public Hotel updateFacilities(List<Facility> newFacilities, String hotelName) {
+        List<Facility> list = hotel.getFacilities();
 
-        Hotel currentHotel=hotelDb.get(hotelName);
-        currentHotel.setFacilities(newFacilities);
-        return currentHotel;
+        for(int i=0;i<newFacilities.size();i++){
+
+            if(!list.contains(newFacilities.get(i))){
+
+                list.add(newFacilities.get(i));
+            }
+
+        }
+
+        hotel.setFacilities(list);
+
+        hotelHashMap.put(hotelName,hotel);
+
+        return  hotel;
+
+
     }
 }
